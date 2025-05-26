@@ -88,14 +88,27 @@ class MainWindow(QMainWindow):
         self.nav_controller.register_screen("messages", self.messages_screen)
         self.nav_controller.register_screen("profile", self.profile_screen)
 
-        # Start by showing the home screen.
-        self.stacked_widget.setCurrentWidget(self.profile_screen)
+    def connect_signals(self):
+        """Connect signals between screens and the navigation controller."""
+        # Connect bottom nav signals from each tab screen to the navigation controller.
+        self.home_screen.bottom_nav.tab_clicked.connect(
+            self.nav_controller.on_tab_clicked
+        )
+        self.cart_screen.bottom_nav.tab_clicked.connect(
+            self.nav_controller.on_tab_clicked
+        )
+        self.messages_screen.bottom_nav.tab_clicked.connect(
+            self.nav_controller.on_tab_clicked
+        )
+        self.profile_screen.bottom_nav.tab_clicked.connect(
+            self.nav_controller.on_tab_clicked
+        )
 
-        # Connect product clicks from the home screen's product grid to show product details.
+        # Connect product click signal from HomeScreen's product grid to show product details.
         self.home_screen.product_grid.productClicked.connect(self.show_product_details)
-        self.messages_screen.bottom_nav.tab_clicked.connect(self.nav_controller.on_tab_clicked)
-        # Connect bottom nav signals
-        self.profile_screen.bottom_nav.tab_clicked.connect(self.nav_controller.on_tab_clicked)
+        self.home_screen.top_bar.searchClicked.connect(
+            lambda: self.nav_controller.on_tab_clicked("search")
+        )
 
         # Connect back button
         self.profile_screen.backClicked.connect(self.nav_controller.on_back_clicked)
@@ -119,20 +132,15 @@ class MainWindow(QMainWindow):
 
 
 
+
+# ----------------------------------------------------------------
+# Application Entry Point
+# ----------------------------------------------------------------
+
+
 if __name__ == "__main__":
-    # Create the QApplication instance
     app = QApplication(sys.argv)
-
-    # Set a global font using the configuration settings (Inter with default size 24)
-    default_font = QFont(SETTINGS["font_family"], SETTINGS["font_size_default"])
-    # app.setFont(default_font)
-    # logging.debug(
-    #     f"Global application font set to {SETTINGS['font_family']} with size {SETTINGS['font_size_default']}.")
-
-    # Create and show the main window
     window = MainWindow()
     window.show()
     logging.debug("Application started; MainWindow is now visible.")
-
-    # Start the application event loop
     sys.exit(app.exec())
