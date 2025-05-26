@@ -13,6 +13,8 @@ from view.search_screen import SearchScreen
 from view.cart_screen import CartScreen
 from view.messages_screen import MessagesScreen
 from view.profile_screen import ProfileScreen
+from view.login_screen import LoginScreen
+from view.register_screen import RegisterScreen
 
 # Import navigation controller.
 from controller.navigation_controller import NavigationController
@@ -77,14 +79,15 @@ class MainWindow(QMainWindow):
         self.stacked_widget = QStackedWidget()
         self.setCentralWidget(self.stacked_widget)
 
-        # Create screens (ensure they are implemented correctly).
+    def create_screens(self):
+        """Instantiate all application screens."""
+        self.login_screen = LoginScreen()
         self.home_screen = HomeScreen()
         self.search_screen = SearchScreen()
         self.cart_screen = CartScreen()
         self.messages_screen = MessagesScreen()
         self.profile_screen = ProfileScreen()
-
-        # Create and set up the navigation controller.
+        self.register_screen = RegisterScreen()
         self.nav_controller = NavigationController(self.stacked_widget)
 
         # Register tab screens.
@@ -93,6 +96,8 @@ class MainWindow(QMainWindow):
         self.nav_controller.register_screen("cart", self.cart_screen)
         self.nav_controller.register_screen("messages", self.messages_screen)
         self.nav_controller.register_screen("profile", self.profile_screen)
+        self.nav_controller.register_screen("login", self.login_screen)
+        self.nav_controller.register_screen("register", self.register_screen)
 
     def connect_signals(self):
         """Connect signals between screens and the navigation controller."""
@@ -120,6 +125,17 @@ class MainWindow(QMainWindow):
         self.profile_screen.backClicked.connect(self.nav_controller.on_back_clicked)
         self.cart_screen.backClicked.connect(self.nav_controller.on_back_clicked)
         self.search_screen.back.connect(self.nav_controller.on_back_clicked)
+        # Connect LoginScreen navigation signals.
+        self.login_screen.loginSuccessful.connect(
+            lambda: self.nav_controller.on_tab_clicked("home")
+        )
+        self.login_screen.goToRegister.connect(
+            lambda: self.nav_controller.on_tab_clicked("register")
+        )
+        # Connect RegisterScreen navigation signals.
+        self.register_screen.goToLogin.connect(
+            lambda: self.nav_controller.on_tab_clicked("login")
+        )
         # Connect ProfileScreen sign out signal.
         self.profile_screen.signOutClicked.connect(
             lambda: self.nav_controller.on_tab_clicked("login")
