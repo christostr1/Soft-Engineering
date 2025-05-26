@@ -2,13 +2,21 @@ import logging
 import os
 
 from PyQt6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea,
-    QFrame, QToolButton, QPushButton, QSizePolicy
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QLabel,
+    QScrollArea,
+    QFrame,
+    QToolButton,
+    QPushButton,
+    QSizePolicy,
 )
 from PyQt6.QtCore import Qt, QSize, pyqtSignal
 from PyQt6.QtGui import QIcon, QFont, QPixmap
 from config.settings import SETTINGS
 from view.components.bottom_nav import BottomNav
+
 
 class ProfileScreen(QWidget):
     """
@@ -20,7 +28,9 @@ class ProfileScreen(QWidget):
     - Sign Out button
     - Bottom navigation with "profile" tab highlighted
     """
+
     backClicked = pyqtSignal()  # Emitted when the back button is pressed
+    signOutClicked = pyqtSignal()  # Emitted when the back button is pressed
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -72,7 +82,9 @@ class ProfileScreen(QWidget):
         self.bottom_nav = BottomNav(current_tab="profile", parent=self)
         self.bottom_nav.setFixedHeight(70)
         # For a non-transparent background
-        self.bottom_nav.setStyleSheet(f"background-color: {SETTINGS['colors']['neutral']['Neutral 10']};")
+        self.bottom_nav.setStyleSheet(
+            f"background-color: {SETTINGS['colors']['neutral']['Neutral 10']};"
+        )
 
         main_layout.addWidget(self.bottom_nav)
 
@@ -140,7 +152,12 @@ class ProfileScreen(QWidget):
         # Placeholder user avatar
         pixmap = QPixmap("resources/images/profile_avatar.png")
         if not pixmap.isNull():
-            pixmap = pixmap.scaled(80, 80, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+            pixmap = pixmap.scaled(
+                80,
+                80,
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
+            )
             avatar_label.setPixmap(pixmap)
         else:
             avatar_label.setText("No Image")
@@ -188,13 +205,15 @@ class ProfileScreen(QWidget):
         header_layout.addStretch()
 
         see_all_button = QPushButton("See All")
-        see_all_button.setStyleSheet("""
+        see_all_button.setStyleSheet(
+            """
             QPushButton {
                 background: transparent;
                 color: #FE8C00;
                 border: none;
             }
-        """)
+        """
+        )
         see_all_button.setFont(QFont(SETTINGS["font_family"], 12))
         # Connect if needed: see_all_button.clicked.connect(...)
         header_layout.addWidget(see_all_button)
@@ -215,12 +234,14 @@ class ProfileScreen(QWidget):
          - Product image, name, price, items
         """
         card_container = QFrame()
-        card_container.setStyleSheet("""
+        card_container.setStyleSheet(
+            """
             QFrame {
                 background-color: #FFFFFF;
                 border-radius: 12px;
             }
-        """)
+        """
+        )
         layout = QVBoxLayout(card_container)
         layout.setContentsMargins(16, 16, 16, 16)
         layout.setSpacing(8)
@@ -238,14 +259,16 @@ class ProfileScreen(QWidget):
         status_label = QLabel("In Delivery")
         status_label.setFont(QFont(SETTINGS["font_family"], 12, QFont.Weight.Bold))
         status_label.setFixedHeight(24)
-        status_label.setStyleSheet("""
+        status_label.setStyleSheet(
+            """
             QLabel {
                 background-color: #FE8C00;
                 color: white;
                 border-radius: 12px;
                 padding: 0 8px;
             }
-        """)
+        """
+        )
         row1_layout.addWidget(status_label, alignment=Qt.AlignmentFlag.AlignRight)
 
         layout.addLayout(row1_layout)
@@ -255,7 +278,12 @@ class ProfileScreen(QWidget):
         image_label = QLabel()
         pixmap = QPixmap("resources/images/smoked_burger.png")  # Placeholder
         if not pixmap.isNull():
-            pixmap = pixmap.scaled(60, 60, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+            pixmap = pixmap.scaled(
+                60,
+                60,
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
+            )
             image_label.setPixmap(pixmap)
         else:
             image_label.setText("No Image")
@@ -266,7 +294,9 @@ class ProfileScreen(QWidget):
         info_layout.setSpacing(4)
 
         product_name_label = QLabel("Burger With Meat")
-        product_name_label.setFont(QFont(SETTINGS["font_family"], 14, QFont.Weight.Bold))
+        product_name_label.setFont(
+            QFont(SETTINGS["font_family"], 14, QFont.Weight.Bold)
+        )
         product_name_label.setStyleSheet("color: #1E1E1E;")
         info_layout.addWidget(product_name_label)
 
@@ -330,7 +360,12 @@ class ProfileScreen(QWidget):
         icon_label = QLabel()
         pixmap = QPixmap(icon_path)
         if not pixmap.isNull():
-            pixmap = pixmap.scaled(24, 24, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+            pixmap = pixmap.scaled(
+                24,
+                24,
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
+            )
             icon_label.setPixmap(pixmap)
         else:
             icon_label.setText("No Icon")
@@ -346,7 +381,12 @@ class ProfileScreen(QWidget):
         arrow_label = QLabel()
         arrow_pix = QPixmap("resources/icons/arrow_right.png")
         if not arrow_pix.isNull():
-            arrow_pix = arrow_pix.scaled(20, 20, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+            arrow_pix = arrow_pix.scaled(
+                20,
+                20,
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
+            )
             arrow_label.setPixmap(arrow_pix)
         else:
             arrow_label.setText(">")
@@ -367,7 +407,8 @@ class ProfileScreen(QWidget):
 
         btn_sign_out = QPushButton("Sign Out")
         btn_sign_out.setFont(QFont(SETTINGS["font_family"], 14, QFont.Weight.Bold))
-        btn_sign_out.setStyleSheet("""
+        btn_sign_out.setStyleSheet(
+            """
             QPushButton {
                 background-color: transparent;
                 color: #FA3E3E;
@@ -379,8 +420,19 @@ class ProfileScreen(QWidget):
                 background-color: #FA3E3E;
                 color: white;
             }
-        """)
-        # Connect as needed: btn_sign_out.clicked.connect(...)
+        """
+        )
+        btn_sign_out.setCursor(Qt.CursorShape.PointingHandCursor)
+        btn_sign_out.clicked.connect(self.on_sign_out_clicked)
         container_layout.addWidget(btn_sign_out)
 
         return container
+
+    def on_sign_out_clicked(self):
+        """
+        Slot called when 'Sign Out' is pressed, for users who already have an account.
+        """
+        logging.debug(
+            "Sign Out button in ProfileScreen pressed. Emitting signOutClicked signal."
+        )
+        self.signOutClicked.emit()
