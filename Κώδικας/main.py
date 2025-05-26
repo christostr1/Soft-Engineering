@@ -120,6 +120,11 @@ class MainWindow(QMainWindow):
         self.profile_screen.backClicked.connect(self.nav_controller.on_back_clicked)
         self.cart_screen.backClicked.connect(self.nav_controller.on_back_clicked)
         self.search_screen.back.connect(self.nav_controller.on_back_clicked)
+        # Connect ProfileScreen sign out signal.
+        self.profile_screen.signOutClicked.connect(
+            lambda: self.nav_controller.on_tab_clicked("login")
+        )
+
 
 
     def show_product_details(self, product_data: dict):
