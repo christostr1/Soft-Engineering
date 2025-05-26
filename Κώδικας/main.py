@@ -10,16 +10,15 @@ from config.settings import SETTINGS
 # Import screens.
 from view.home_screen import HomeScreen
 from view.search_screen import SearchScreen
-from view.product_details_screen import ProductDetailsScreen
-from view.cart import CartScreen
+from view.cart_screen import CartScreen
 from view.messages_screen import MessagesScreen
 from view.profile_screen import ProfileScreen
 
-# Import configuration settings for fonts and colors
-from config.settings import SETTINGS
+# Import navigation controller.
+from controller.navigation_controller import NavigationController
 
-# Import colorama for colored logging output
-from colorama import Fore, Style, init
+# Import custom widgets.
+from model.payment_method import PaymentMethod
 
 from controller.navigation_controller import NavigationController
 
@@ -29,8 +28,9 @@ init(autoreset=True)
 
 class ColoredFormatter(logging.Formatter):
     """
-    Custom logging formatter to add colors based on the log level.
+    Custom logging formatter that adds colors based on log levels.
     """
+
     LEVEL_COLORS = {
         logging.DEBUG: Fore.GREEN,
         logging.INFO: Fore.WHITE,
@@ -118,6 +118,7 @@ class MainWindow(QMainWindow):
 
         # Connect back button signals for dynamic screens.
         self.profile_screen.backClicked.connect(self.nav_controller.on_back_clicked)
+        self.cart_screen.backClicked.connect(self.nav_controller.on_back_clicked)
         self.search_screen.back.connect(self.nav_controller.on_back_clicked)
 
 
