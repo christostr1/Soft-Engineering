@@ -30,8 +30,12 @@ class HomeScreen(QWidget):
         # Create scroll area for all the content.
         self.scroll_area = QScrollArea(self)
         self.scroll_area.setWidgetResizable(True)
-        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.scroll_area.setVerticalScrollBarPolicy(
+            Qt.ScrollBarPolicy.ScrollBarAsNeeded
+        )
+        self.scroll_area.setHorizontalScrollBarPolicy(
+            Qt.ScrollBarPolicy.ScrollBarAlwaysOff
+        )
 
         # Content widget with its layout.
         self.content_widget = QFrame()
@@ -40,15 +44,15 @@ class HomeScreen(QWidget):
         self.content_layout.setSpacing(0)
 
         # TopBar widget (with background image, location, and icons)
-        top_bar = TopBarWidget()
-        self.content_layout.addWidget(top_bar)
+        self.top_bar = TopBarWidget()
+        self.content_layout.addWidget(self.top_bar)
 
         # Category Widget with placeholder categories.
         categories = [
             ("resources/images/burger.png", "Burger", True),
             ("resources/images/taco.png", "Taco", False),
             ("resources/images/drink.png", "Drink", False),
-            ("resources/images/pizza.png", "Pizza", False)
+            ("resources/images/pizza.png", "Pizza", False),
         ]
         self.category_widget = CategoryWidget(categories)
         self.content_layout.addWidget(self.category_widget)
@@ -60,29 +64,29 @@ class HomeScreen(QWidget):
                 "title": "Smoked Burger",
                 "rating": "4.5",
                 "distance": "1.2km",
-                "price": "$10.00"
+                "price": "€10.00",
             },
             {
                 "image": "resources/images/classic_burger.png",
                 "title": "Classic Burger",
                 "rating": "4.7",
                 "distance": "2.0km",
-                "price": "$9.50"
+                "price": "€9.50",
             },
             {
-                "image": "resources/images/smoked_burger.png",
-                "title": "Smoked Burger",
-                "rating": "4.5",
-                "distance": "1.2km",
-                "price": "$10.00"
+                "image": "resources/images/cheeseburger.png",
+                "title": "Cheeseburger",
+                "rating": "4.9",
+                "distance": "3.0km",
+                "price": "€8.00",
             },
             {
-                "image": "resources/images/classic_burger.png",
-                "title": "Classic Burger",
-                "rating": "4.7",
-                "distance": "2.0km",
-                "price": "$9.50"
-            }
+                "image": "resources/images/ten_years_old_beef_burger.png",
+                "title": "Beef Burger",
+                "rating": "4.1",
+                "distance": "1.1km",
+                "price": "€15.50",
+            },
         ]
         self.product_grid = ProductGrid(products)
         self.content_layout.addWidget(self.product_grid)
@@ -90,7 +94,9 @@ class HomeScreen(QWidget):
         # IMPORTANT: Add bottom padding to the content layout so that the last elements
         # are not hidden behind the bottom nav.
         self.content_layout.addStretch(1)
-        self.content_layout.setContentsMargins(0, 0, 0, 10)  # 70px bottom padding; adjust as needed.
+        self.content_layout.setContentsMargins(
+            0, 0, 0, 10
+        )  # 70px bottom padding; adjust as needed.
 
         # Set the content widget in the scroll area.
         self.scroll_area.setWidget(self.content_widget)
@@ -103,10 +109,11 @@ class HomeScreen(QWidget):
         self.bottom_nav = BottomNav(current_tab="home", parent=self)
         self.bottom_nav.setFixedHeight(70)
         # Update its stylesheet to have a solid background color. You can refer to your settings.
-        self.bottom_nav.setStyleSheet(f"background-color: {SETTINGS['colors']['neutral']['Neutral 10']};")
+        self.bottom_nav.setStyleSheet(
+            f"background-color: {SETTINGS['colors']['neutral']['Neutral 10']};"
+        )
         # Add the bottom nav at the bottom of the main layout.
         self.main_layout.addWidget(self.bottom_nav)
 
         print("DEBUG: HomeScreen init completed")
         self.setLayout(self.main_layout)
-

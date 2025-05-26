@@ -4,9 +4,8 @@ import os
 
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel, QPushButton, QComboBox, QVBoxLayout, QFrame
 from PyQt6.QtGui import QFont, QIcon, QPainter, QPixmap
-from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtCore import Qt, QSize, pyqtSignal
 from config.settings import SETTINGS
-
 
 class TopBarWidget(QWidget):
     """
@@ -14,6 +13,8 @@ class TopBarWidget(QWidget):
     a dropdown for changing location, and search/bell icons.
     This widget draws a background image by overriding paintEvent.
     """
+    searchClicked = pyqtSignal()
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setFixedHeight(220)
@@ -66,6 +67,8 @@ class TopBarWidget(QWidget):
         icon_search.setIconSize(QSize(24, 24))
         icon_search.setFixedSize(36, 36)
         icon_search.setStyleSheet("border: none; background-color: transparent;")
+        # Connect button to emit the searchClicked signal
+        icon_search.clicked.connect(self.searchClicked.emit)
 
         icon_bell = QPushButton()
         bell_icon_path = os.path.join(script_dir, "..", "..", "resources", "icons", "bell.png")

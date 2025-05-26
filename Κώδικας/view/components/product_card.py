@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame
 from PyQt6.QtGui import QPixmap, QFont
 from PyQt6.QtCore import Qt, pyqtSignal
 
+
 class ProductCard(QFrame):
     # Emit this signal when the card is clicked.
     clicked = pyqtSignal()
@@ -12,12 +13,14 @@ class ProductCard(QFrame):
         super().__init__()
 
         self.setFixedSize(160, 240)
-        self.setStyleSheet("""
+        self.setStyleSheet(
+            """
             QFrame {
                 background-color: white;
                 border-radius: 16px;
             }
-        """)
+        """
+        )
 
         layout = QVBoxLayout()
         layout.setContentsMargins(8, 8, 8, 8)
@@ -26,9 +29,10 @@ class ProductCard(QFrame):
         # --- Product Image ---
         image_label = QLabel()
         pixmap = QPixmap(image).scaled(
-            144, 100,
+            144,
+            100,
             Qt.AspectRatioMode.KeepAspectRatio,
-            Qt.TransformationMode.SmoothTransformation
+            Qt.TransformationMode.SmoothTransformation,
         )
         image_label.setPixmap(pixmap)
         image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -45,15 +49,21 @@ class ProductCard(QFrame):
         info_layout.setSpacing(4)
         # Compute the base directory relative to this file.
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        star_icon_path = os.path.join(script_dir, "..", "assets", "icons", "star.png")
-        location_icon_path = os.path.join(script_dir, "..", "assets", "icons", "location.png")
-
+        star_icon_path = os.path.join(
+            script_dir, "..", "..", "resources", "icons", "star.png"
+        )
+        location_icon_path = os.path.join(
+            script_dir, "..", "..", "resources", "icons", "location.png"
+        )
+        print(f"DEBUG: Star icon path: {star_icon_path}")
+        print(f"DEBUG: Location icon path: {location_icon_path}")
         # Star icon for rating
         star_label = QLabel()
         star_pix = QPixmap(star_icon_path).scaled(
-            14, 14,
+            14,
+            14,
             Qt.AspectRatioMode.KeepAspectRatio,
-            Qt.TransformationMode.SmoothTransformation
+            Qt.TransformationMode.SmoothTransformation,
         )
         star_label.setPixmap(star_pix)
         info_layout.addWidget(star_label)
@@ -71,9 +81,10 @@ class ProductCard(QFrame):
         # Location icon for distance
         location_icon_label = QLabel()
         loc_pix = QPixmap(location_icon_path).scaled(
-            14, 14,
+            14,
+            14,
             Qt.AspectRatioMode.KeepAspectRatio,
-            Qt.TransformationMode.SmoothTransformation
+            Qt.TransformationMode.SmoothTransformation,
         )
         location_icon_label.setPixmap(loc_pix)
         info_layout.addWidget(location_icon_label)
