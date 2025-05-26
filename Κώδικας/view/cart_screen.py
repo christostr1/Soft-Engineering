@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import (
     QFrame, QScrollArea, QCheckBox, QToolButton, QSpinBox, QSizePolicy
 )
 from PyQt6.QtGui import QFont, QIcon, QPixmap
-from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtCore import Qt, QSize, pyqtSignal
 from config.settings import SETTINGS
 from view.components.bottom_nav import BottomNav
 
@@ -16,6 +16,8 @@ class CartScreen(QWidget):
     Includes a top bar, delivery location info, promo code row,
     cart items, payment summary, and an 'Order Now' button.
     """
+    backClicked = pyqtSignal()  # Emitted when the back button is pressed
+
     def __init__(self, parent=None):
         super().__init__(parent)
         logging.debug("Initializing CartScreen.")
@@ -123,7 +125,7 @@ class CartScreen(QWidget):
         return container
 
     def on_back_clicked(self):
-        logging.debug("Back button clicked in ProductDetailsScreen.")
+        logging.debug("Back button clicked in Cart.")
         self.backClicked.emit()
 
     def create_delivery_row(self) -> QWidget:
