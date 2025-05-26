@@ -1,8 +1,13 @@
-# main.py
 import sys
 import logging
-from PyQt6.QtWidgets import QApplication, QMainWindow, QStackedWidget, QPushButton
+from PyQt6.QtWidgets import QApplication, QMainWindow, QStackedWidget
 from PyQt6.QtGui import QFont
+from colorama import Fore, Style, init
+
+# Import configuration settings.
+from config.settings import SETTINGS
+
+# Import screens.
 from view.home_screen import HomeScreen
 from view.search_screen import SearchScreen
 from view.product_details_screen import ProductDetailsScreen
@@ -84,6 +89,7 @@ class MainWindow(QMainWindow):
 
         # Register tab screens.
         self.nav_controller.register_screen("home", self.home_screen)
+        self.nav_controller.register_screen("search", self.search_screen)
         self.nav_controller.register_screen("cart", self.cart_screen)
         self.nav_controller.register_screen("messages", self.messages_screen)
         self.nav_controller.register_screen("profile", self.profile_screen)
@@ -110,13 +116,9 @@ class MainWindow(QMainWindow):
             lambda: self.nav_controller.on_tab_clicked("search")
         )
 
-        # Connect back button
+        # Connect back button signals for dynamic screens.
         self.profile_screen.backClicked.connect(self.nav_controller.on_back_clicked)
-        # Connect product click signal from HomeScreen's product grid for demonstration.
-        # Optionally, if you have a bottom nav that emits tab clicked signals,
-        # connect them to the navigation controller's on_tab_clicked:
-        self.home_screen.bottom_nav.tab_clicked.connect(self.nav_controller.on_tab_clicked)
-        self.cart_screen.bottom_nav.tab_clicked.connect(self.nav_controller.on_tab_clicked)
+        self.search_screen.back.connect(self.nav_controller.on_back_clicked)
 
 
     def show_product_details(self, product_data: dict):
