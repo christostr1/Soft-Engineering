@@ -15,6 +15,8 @@ from view.messages_screen import MessagesScreen
 from view.profile_screen import ProfileScreen
 from view.login_screen import LoginScreen
 from view.register_screen import RegisterScreen
+from view.payment_methods_screen import PaymentMethodsScreen
+from view.add_card_dialog import AddCardDialog
 from view.recommendation_screen import RecommendationScreen
 
 # Import navigation controller.
@@ -25,7 +27,9 @@ from model.payment_method import PaymentMethod
 
 from controller.navigation_controller import NavigationController
 
-# Initialize colorama with autoreset to ensure colors are reset after each log message
+# ----------------------------------------------------------------
+# Setup Logging with Colorama
+# ----------------------------------------------------------------
 init(autoreset=True)
 
 
@@ -48,19 +52,21 @@ class ColoredFormatter(logging.Formatter):
         return super().format(record)
 
 
-# Configure root logger
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.DEBUG)
-
-# Define log format
 log_format = "%(asctime)s - %(levelname)s - %(message)s"
-formatter = ColoredFormatter(log_format)
-console_handler.setFormatter(formatter)
+console_handler.setFormatter(ColoredFormatter(log_format))
 logger.addHandler(console_handler)
 
-logging.debug("Custom colored logging is set up with configuration settings integrated.")
+logging.debug(
+    "Custom colored logging is set up with configuration settings integrated."
+)
+
+# ----------------------------------------------------------------
+# MainWindow Definition
+# ----------------------------------------------------------------
 
 
 class MainWindow(QMainWindow):
@@ -75,11 +81,7 @@ class MainWindow(QMainWindow):
     def initialize_window(self):
         """Set window title, size, and stylesheet."""
         self.setWindowTitle("SmartBite")
-        self.setMinimumSize(400, 800)
-        logging.debug("Main window initialized with title 'SmartBite' and size 400x800.")
-
-        # Set a sample stylesheet using the configured primary surface color
-        # (Update with appropriate configuration as needed)
+        self.setMinimumSize(400, 800)  # Using minimum size; adjust as needed.
         neutral_surface = SETTINGS["colors"]["neutral"]["Neutral 20"]
         self.setStyleSheet(f"background-color: {neutral_surface};")
         logging.debug(
@@ -101,10 +103,14 @@ class MainWindow(QMainWindow):
         self.messages_screen = MessagesScreen()
         self.profile_screen = ProfileScreen()
         self.register_screen = RegisterScreen()
+        self.payment_methonds_screen = PaymentMethodsScreen()
         self.recommendation_screen = RecommendationScreen()
         self.nav_controller = NavigationController(self.stacked_widget)
 
-        # Register tab screens.
+    def setup_navigation_controller(self):
+        """Create and register tab screens with the NavigationController."""
+        self.nav_controller = NavigationController(self.stacked_widget)
+        # Register persistent tab screens.
         self.nav_controller.register_screen("home", self.home_screen)
         self.nav_controller.register_screen("search", self.search_screen)
         self.nav_controller.register_screen("cart", self.cart_screen)
@@ -112,6 +118,10 @@ class MainWindow(QMainWindow):
         self.nav_controller.register_screen("profile", self.profile_screen)
         self.nav_controller.register_screen("login", self.login_screen)
         self.nav_controller.register_screen("register", self.register_screen)
+        self.nav_controller.register_screen(
+            "payment_methonds", self.payment_methonds_screen
+        )
+        self.nav_controller.register_screen("add_card_dialog", self.add_card_dialog)
         self.nav_controller.register_screen(
             "recommendations", self.recommendation_screen
         )
@@ -145,6 +155,7 @@ class MainWindow(QMainWindow):
         self.profile_screen.backClicked.connect(self.nav_controller.on_back_clicked)
         self.cart_screen.backClicked.connect(self.nav_controller.on_back_clicked)
         self.search_screen.back.connect(self.nav_controller.on_back_clicked)
+        self.payment_methonds_screen.back.connect(self.nav_controller.on_back_clicked)
         # Connect LoginScreen navigation signals.
         self.login_screen.loginSuccessful.connect(
             lambda: self.nav_controller.on_tab_clicked("home")
@@ -161,9 +172,44 @@ class MainWindow(QMainWindow):
             lambda: self.nav_controller.on_tab_clicked("login")
         )
 
+        self.payment_methonds_screen.addNewCard.connect(self.open_add_card_dialog)
+        self.add_card_dialog.saved.connect(self.handle_new_card)
 
         # back from recommendations
         self.recommendation_screen.back.connect(self.nav_controller.on_back_clicked)
+
+    def open_add_card_dialog(self):
+        """Show the AddCardDialog as a modal dialog."""
+        # You can recreate it each time, or reuse self.add_card_dialog
+        dlg = AddCardDialog(self)
+        dlg.saved.connect(self.handle_new_card)  # so you can react when Save is clicked
+        dlg.exec()  # blocks until dialog closes
+
+    def handle_new_card(self, data: dict):
+        """
+        data == {
+           'holder': str,
+           'number': str,
+           'expiry': str,
+           'cvv'   : str,
+        }
+        """
+        # 1) instantiate & validate
+        pm = PaymentMethod(
+            holder=data["holder"],
+            number=data["number"],
+            expiry=data["expiry"],
+            cvv=data["cvv"],
+        )
+        try:
+            pm.validate()
+        except Exception as e:
+            # you might show a QMessageBox here
+            logging.error(f"Failed to add card: {e}")
+            return
+
+        # 2) add to PaymentMethodsScreen
+        self.payment_methonds_screen.add_payment_method(pm)
 
     def show_product_details(self, product_data: dict):
         """
