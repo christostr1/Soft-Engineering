@@ -15,6 +15,7 @@ from view.messages_screen import MessagesScreen
 from view.profile_screen import ProfileScreen
 from view.login_screen import LoginScreen
 from view.register_screen import RegisterScreen
+from view.recommendation_screen import RecommendationScreen
 
 # Import navigation controller.
 from controller.navigation_controller import NavigationController
@@ -65,7 +66,14 @@ logging.debug("Custom colored logging is set up with configuration settings inte
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        # Set the window title and initial size
+        self.initialize_window()
+        self.create_screens()
+        self.setup_navigation_controller()
+        self.connect_signals()
+        self.delivery_persons: list[DeliveryPerson] = []
+
+    def initialize_window(self):
+        """Set window title, size, and stylesheet."""
         self.setWindowTitle("SmartBite")
         self.setMinimumSize(400, 800)
         logging.debug("Main window initialized with title 'SmartBite' and size 400x800.")
@@ -74,7 +82,12 @@ class MainWindow(QMainWindow):
         # (Update with appropriate configuration as needed)
         neutral_surface = SETTINGS["colors"]["neutral"]["Neutral 20"]
         self.setStyleSheet(f"background-color: {neutral_surface};")
-        logging.debug(f"Main window stylesheet set with background color: {neutral_surface}")
+        logging.debug(
+            "Main window initialized with title 'SmartBite' and size 400x800."
+        )
+        logging.debug(
+            f"Main window stylesheet set with background color: {neutral_surface}"
+        )
 
         self.stacked_widget = QStackedWidget()
         self.setCentralWidget(self.stacked_widget)
@@ -88,6 +101,7 @@ class MainWindow(QMainWindow):
         self.messages_screen = MessagesScreen()
         self.profile_screen = ProfileScreen()
         self.register_screen = RegisterScreen()
+        self.recommendation_screen = RecommendationScreen()
         self.nav_controller = NavigationController(self.stacked_widget)
 
         # Register tab screens.
@@ -98,6 +112,12 @@ class MainWindow(QMainWindow):
         self.nav_controller.register_screen("profile", self.profile_screen)
         self.nav_controller.register_screen("login", self.login_screen)
         self.nav_controller.register_screen("register", self.register_screen)
+        self.nav_controller.register_screen(
+            "recommendations", self.recommendation_screen
+        )
+
+        # Start by displaying the Home screen.
+        self.stacked_widget.setCurrentWidget(self.recommendation_screen)
 
     def connect_signals(self):
         """Connect signals between screens and the navigation controller."""
@@ -142,6 +162,8 @@ class MainWindow(QMainWindow):
         )
 
 
+        # back from recommendations
+        self.recommendation_screen.back.connect(self.nav_controller.on_back_clicked)
 
     def show_product_details(self, product_data: dict):
         """
