@@ -13,8 +13,10 @@ from view.search_screen import SearchScreen
 from view.cart_screen import CartScreen
 from view.messages_screen import MessagesScreen
 from view.profile_screen import ProfileScreen
+from view.product_details_screen import ProductDetailsScreen
 from view.login_screen import LoginScreen
 from view.register_screen import RegisterScreen
+from view.edit_profile_screen import EditProfileScreen
 from view.payment_methods_screen import PaymentMethodsScreen
 from view.add_card_dialog import AddCardDialog
 from view.recommendation_screen import RecommendationScreen
@@ -26,6 +28,9 @@ from controller.navigation_controller import NavigationController
 from model.payment_method import PaymentMethod
 
 from controller.navigation_controller import NavigationController
+from model.errors import MissingNameError
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QLabel, QMessageBox
 
 # ----------------------------------------------------------------
 # Setup Logging with Colorama
@@ -103,7 +108,9 @@ class MainWindow(QMainWindow):
         self.messages_screen = MessagesScreen()
         self.profile_screen = ProfileScreen()
         self.register_screen = RegisterScreen()
+        self.edit_profile_screen = EditProfileScreen()
         self.payment_methonds_screen = PaymentMethodsScreen()
+        self.add_card_dialog = AddCardDialog()
         self.recommendation_screen = RecommendationScreen()
         self.nav_controller = NavigationController(self.stacked_widget)
 
@@ -118,6 +125,7 @@ class MainWindow(QMainWindow):
         self.nav_controller.register_screen("profile", self.profile_screen)
         self.nav_controller.register_screen("login", self.login_screen)
         self.nav_controller.register_screen("register", self.register_screen)
+        self.nav_controller.register_screen("edit_profile", self.edit_profile_screen)
         self.nav_controller.register_screen(
             "payment_methonds", self.payment_methonds_screen
         )
@@ -154,7 +162,9 @@ class MainWindow(QMainWindow):
         # Connect back button signals for dynamic screens.
         self.profile_screen.backClicked.connect(self.nav_controller.on_back_clicked)
         self.cart_screen.backClicked.connect(self.nav_controller.on_back_clicked)
+        self.messages_screen.backClicked.connect(self.nav_controller.on_back_clicked)
         self.search_screen.back.connect(self.nav_controller.on_back_clicked)
+        self.edit_profile_screen.back.connect(self.nav_controller.on_back_clicked)
         self.payment_methonds_screen.back.connect(self.nav_controller.on_back_clicked)
         # Connect LoginScreen navigation signals.
         self.login_screen.loginSuccessful.connect(
@@ -175,6 +185,10 @@ class MainWindow(QMainWindow):
         self.payment_methonds_screen.addNewCard.connect(self.open_add_card_dialog)
         self.add_card_dialog.saved.connect(self.handle_new_card)
 
+        # from Home: when app starts, go to recommendations
+        self.home_screen.top_bar.searchClicked.connect(
+            lambda: self.nav_controller.on_tab_clicked("recommendations")
+        )
         # back from recommendations
         self.recommendation_screen.back.connect(self.nav_controller.on_back_clicked)
 
@@ -218,9 +232,9 @@ class MainWindow(QMainWindow):
         and adds it as a dynamic screen.
         """
         product_details_screen = ProductDetailsScreen(product_data)
-        # Connect the back button signal to the controller's on_back_clicked slot.
         product_details_screen.backClicked.connect(self.nav_controller.on_back_clicked)
         self.nav_controller.add_screen("details", product_details_screen)
+        logging.debug("Product details screen displayed.")
 
 
 
