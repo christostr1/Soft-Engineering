@@ -19,6 +19,7 @@ from view.register_screen import RegisterScreen
 from view.edit_profile_screen import EditProfileScreen
 from view.payment_methods_screen import PaymentMethodsScreen
 from view.add_card_dialog import AddCardDialog
+from view.delivery_registration_screen import DeliveryRegistrationScreen
 from view.recommendation_screen import RecommendationScreen
 
 # Import navigation controller.
@@ -27,7 +28,13 @@ from controller.navigation_controller import NavigationController
 # Import custom widgets.
 from model.payment_method import PaymentMethod
 
-from controller.navigation_controller import NavigationController
+from model.delivery_person import (
+    DeliveryPerson,
+    InvalidEmailError,
+    InvalidPhoneError,
+    InvalidLicensePlateError,
+    WeakPasswordError,
+)
 from model.errors import MissingNameError
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QLabel, QMessageBox
@@ -111,8 +118,8 @@ class MainWindow(QMainWindow):
         self.edit_profile_screen = EditProfileScreen()
         self.payment_methonds_screen = PaymentMethodsScreen()
         self.add_card_dialog = AddCardDialog()
+        self.delivery_reg_screen = DeliveryRegistrationScreen()
         self.recommendation_screen = RecommendationScreen()
-        self.nav_controller = NavigationController(self.stacked_widget)
 
     def setup_navigation_controller(self):
         """Create and register tab screens with the NavigationController."""
@@ -130,6 +137,9 @@ class MainWindow(QMainWindow):
             "payment_methonds", self.payment_methonds_screen
         )
         self.nav_controller.register_screen("add_card_dialog", self.add_card_dialog)
+        self.nav_controller.register_screen(
+            "delivery_register", self.delivery_reg_screen
+        )
         self.nav_controller.register_screen(
             "recommendations", self.recommendation_screen
         )
@@ -166,6 +176,10 @@ class MainWindow(QMainWindow):
         self.search_screen.back.connect(self.nav_controller.on_back_clicked)
         self.edit_profile_screen.back.connect(self.nav_controller.on_back_clicked)
         self.payment_methonds_screen.back.connect(self.nav_controller.on_back_clicked)
+        self.delivery_reg_screen.backClicked.connect(
+            self.nav_controller.on_back_clicked
+        )
+        self.delivery_reg_screen.registerClicked.connect(self.handle_new_deliveryman)
         # Connect LoginScreen navigation signals.
         self.login_screen.loginSuccessful.connect(
             lambda: self.nav_controller.on_tab_clicked("home")
@@ -236,7 +250,47 @@ class MainWindow(QMainWindow):
         self.nav_controller.add_screen("details", product_details_screen)
         logging.debug("Product details screen displayed.")
 
+    def handle_new_deliveryman(self, data: dict):
+        """
+        data keys: name, email, phone, vehicle, license_plate, password
+        """
+        try:
+            dp = DeliveryPerson(
+                name=data["name"],
+                email=data["email"],
+                phone=data["phone"],
+                vehicle_type=data["vehicle"],
+                license_plate=data["license_plate"],
+                password=data["password"],
+            )
+        except (
+            MissingNameError,
+            InvalidEmailError,
+            InvalidPhoneError,
+            InvalidLicensePlateError,
+            WeakPasswordError,
+        ) as e:
+            # build a custom message box
+            msg = QMessageBox(self)
+            msg.setIcon(QMessageBox.Icon.Warning)
+            msg.setWindowTitle("Validation Error")
+            # ensure plain text so HTML styling doesn’t eat it
+            msg.setTextFormat(Qt.TextFormat.PlainText)
+            msg.setText(str(e))
 
+            # now find the internal label and force its color to black
+            label = msg.findChild(QLabel, "qt_msgbox_label")
+            if label:
+                label.setStyleSheet("color: black;")
+
+            msg.exec()
+            return
+
+        # success → store and notify
+        self.delivery_persons.append(dp)
+        QMessageBox.information(self, "Success", "Delivery person registered!")
+        # navigate back or onward
+        self.nav_controller.on_back_clicked()
 
 
 # ----------------------------------------------------------------
